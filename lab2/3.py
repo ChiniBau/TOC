@@ -35,29 +35,17 @@ class PDA:
         return False
 
 
-def main():
-    print("\n---- PDA Menu ----")
+if __name__ == "__main__":
     while True:
-        print("1. Input a string to check")
-        print("2. Exit")
-        choice = input("Enter your choice (1 or 2): ")
-
-        if choice == '1':
-            string = input("Enter a binary string of the form 0^n1^n: ")
-            if all(ch in '01' for ch in string):
-                pda = PDA()
-                if pda.process_string(string):
-                    print("String is ACCEPTED by the PDA (final state acceptance).\n")
-                else:
-                    print("String is REJECTED by the PDA.\n")
-            else:
-                print("Invalid input. Please enter a string containing only 0 and 1.\n")
-        elif choice == '2':
+        string = input("Enter a binary string of the form 0^n1^n, or 'q' to quit: ")
+        if string.lower() == 'q':
             print("Exiting the program. Goodbye!")
             break
+        if all(ch in '01' for ch in string):
+            pda = PDA()
+            if pda.process_string(string):
+                print("String is ACCEPTED by the PDA (final state acceptance).\n")
+            else:
+                print("String is REJECTED by the PDA.\n")
         else:
-            print("Invalid choice. Please enter 1 or 2.\n")
-
-
-if __name__ == "__main__":
-    main()
+            print("Invalid input. Please enter a string containing only 0 and 1.\n")
