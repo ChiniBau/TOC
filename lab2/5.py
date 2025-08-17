@@ -3,51 +3,79 @@ class PDA:
         self.stack = []
         self.state = 'q0'
 
-    def transition(self, symbol):
-        if self.state == 'q0':
-            if symbol == 'a':
-                self.stack.append('A')  # Push A for every a
-            elif symbol == 'b':
-                self.state = 'q1'
-            else:
-                self.state = 'reject'
-
-        elif self.state == 'q1':
-            if symbol == 'b':
-                self.stack.append('B')  # Push B for every b
+    def transition(self, symbol, half_done=False):
+        if not half_done:
+            # First half w: push symbols onto stack
+            if symbol in ['a', 'b']:
+                self.stack.append(symbol)
             elif symbol == 'c':
-                self.state = 'q2'
+                self.state = 'q1'  # Transition to second half
             else:
                 self.state = 'reject'
-
-        elif self.state == 'q2':
-            if symbol == 'c':
-                if self.stack:
-                    top = self.stack.pop()
-                    if top not in ['A', 'B']:
-                        self.state = 'reject'
-                else:
-                    self.state = 'reject'
+        else:
+            # Second half w^R: pop and compare
+            if self.stack and symbol == self.stack[-1]:
+                self.stack.pop()
             else:
                 self.state = 'reject'
 
     def process_string(self, input_string):
+        half_done = False
         for symbol in input_string:
-            self.transition(symbol)
+            if symbol == 'c':
+                half_done = True
+                self.transition(symbol, half_done=False)  # Just switch state
+            else:
+                self.transition(symbol, half_done=half_done)
             if self.state == 'reject':
                 return False
 
-        # Accept by final state if stack is empty and last state is q2
-        if not self.stack and self.state == 'q2':
+        # Accept by final state if stack is empty and state is q1
+        if not self.stack and self.state == 'q1':
             return True
         return False
 
 
-# Example usage
+def main():
+    print("\n---- PDA Menu ----")
+    while True:
+        print("1. Input a string to check")
+        print("2. Check multiple strings")
+        print("3. Exit")
+        choice = input("Enter your choice (1, 2 or 3): ")
+
+        if choice == '1':
+            string = input("Enter a string of the form w c w^R with w ∈ {a,b}: ")
+            if all(ch in 'abc' for ch in string):
+                pda = PDA()
+                if pda.process_string(string):
+                    print("String is ACCEPTED by the PDA (final state acceptance).\n")
+                else:
+                    print("String is REJECTED by the PDA.\n")
+            else:
+                print("Invalid input. Please enter a string containing only a, b, c.\n")
+
+        elif choice == '2':
+            n = int(input("How many strings do you want to check? "))
+            for i in range(n):
+                string = input(f"Enter string {i+1}: ")
+                if all(ch in 'abc' for ch in string):
+                    pda = PDA()
+                    if pda.process_string(string):
+                        print(f"String '{string}' is ACCEPTED by the PDA.")
+                    else:
+                        print(f"String '{string}' is REJECTED by the PDA.")
+                else:
+                    print("Invalid input. Only characters a, b, c allowed.")
+            print()
+
+        elif choice == '3':
+            print("Exiting the program. Goodbye!")
+            break
+
+        else:
+            print("Invalid choice. Please enter 1, 2, or 3.\n")
+
+
 if __name__ == "__main__":
-    user_input = input("Enter a string of the form a^n b^m c^n with n,m >= 1: ")
-    pda = PDA()
-    if pda.process_string(user_input):
-        print(f"String '{user_input}' is accepted by final state.")
-    else:
-        print(f"String '{user_input}' is rejected.")
+    main()

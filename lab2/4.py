@@ -36,11 +36,29 @@ class PDA:
         return False
 
 
-# Example usage
+def main():
+    print("\n---- PDA Menu ----")
+    while True:
+        print("1. Input a string to check")
+        print("2. Exit")
+        choice = input("Enter your choice (1 or 2): ")
+
+        if choice == '1':
+            string = input("Enter a string of the form w c w^R with w ∈ {a,b}: ")
+            if all(ch in 'abc' for ch in string):
+                pda = PDA()
+                if pda.process_string(string):
+                    print("String is ACCEPTED by the PDA (final state acceptance).\n")
+                else:
+                    print("String is REJECTED by the PDA.\n")
+            else:
+                print("Invalid input. Please enter a string containing only a, b, c.\n")
+        elif choice == '2':
+            print("Exiting the program. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please enter 1 or 2.\n")
+
+
 if __name__ == "__main__":
-    user_input = input("Enter a string of the form w c w^R with w ∈ {a,b}: ")
-    pda = PDA()
-    if pda.process_string(user_input):
-        print(f"String '{user_input}' is accepted by final state.")
-    else:
-        print(f"String '{user_input}' is rejected.")
+    main()
