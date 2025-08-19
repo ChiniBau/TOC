@@ -16,9 +16,10 @@ class PDA:
         elif self.state == 'q1':
             # Read b's without touching stack
             if symbol == 'b':
-                pass  # just stay in q1
-            elif symbol == 'c':
+                pass  # stay in q1
+            elif symbol == 'c' and self.stack:
                 self.state = 'q2'
+                self.stack.pop()  # consume one 'a' immediately when first 'c' comes
             else:
                 self.state = 'reject'
 
@@ -30,13 +31,24 @@ class PDA:
                 self.state = 'reject'
 
     def process_string(self, input_string):
+        a_seen = False
+        b_seen = False
+        c_seen = False
+
         for symbol in input_string:
+            if symbol == 'a':
+                a_seen = True
+            if symbol == 'b':
+                b_seen = True
+            if symbol == 'c':
+                c_seen = True
+
             self.transition(symbol)
             if self.state == 'reject':
                 return False
 
-        # Accept if stack empty and state is q2 (after matching all c's)
-        if not self.stack and self.state == 'q2':
+        # Accept if stack empty, in q2, and at least one 'a','b','c' seen
+        if not self.stack and self.state == 'q2' and a_seen and b_seen and c_seen:
             return True
         return False
 
@@ -50,8 +62,8 @@ if __name__ == "__main__":
         if all(ch in 'abc' for ch in string):
             pda = PDA()
             if pda.process_string(string):
-                print("String is ACCEPTED by the PDA (final state acceptance).\n")
+                print(" String is ACCEPTED by the PDA (final state acceptance).\n")
             else:
-                print("String is REJECTED by the PDA.\n")
+                print(" String is REJECTED by the PDA.\n")
         else:
             print("Invalid input. Please enter a string containing only a, b, c.\n")
